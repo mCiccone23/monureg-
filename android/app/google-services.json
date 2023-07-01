@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "648839958281",
+    "project_id": "regmonu",
+    "storage_bucket": "regmonu.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:648839958281:android:db3de4bba87c9cd5cfcdd8",
+        "android_client_info": {
+          "package_name": "com.example.monureg"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGlpmul5RheQjjgd_mT6tMOOUEq4zWzJU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
