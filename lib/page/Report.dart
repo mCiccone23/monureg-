@@ -13,17 +13,19 @@ import 'MonumentView.dart';
 
 class Report extends StatefulWidget {
   final String url;
+  final File? image;
 
-  Report({required this.url});
+  Report({required this.url, this.image});
 
   @override
-  _ReportState createState() => _ReportState(url);
+  _ReportState createState() => _ReportState(url, image);
 }
 
 class _ReportState extends State<Report> {
   String url;
+  File? image;
 
-  _ReportState(this.url);
+  _ReportState(this.url, this.image);
 
  final _formKey = GlobalKey<FormState>();
  TextEditingController _emailController = TextEditingController();
@@ -80,7 +82,7 @@ class _ReportState extends State<Report> {
   void apriDartFile(BuildContext context) {
     Navigator.push(
       context,
-     PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => MonumentView(url: url, descrizione: _descrizione, monumento: _monumento,),
+     PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => MonumentView(url: _image, descrizione: _descrizione, monumento: _monumento,),
      transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return child;
     },
@@ -91,7 +93,7 @@ class _ReportState extends State<Report> {
   void apriDartFile2(BuildContext context) {
     Navigator.push(
       context,
-     PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => Report(url: _imageUrl!),
+     PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => Report(url: url, image: image),
      transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return child;
     },
@@ -122,7 +124,7 @@ class _ReportState extends State<Report> {
       return Center(child: CircularProgressIndicator());
       }
     );
-    final apiUrl = 'http://172.20.10.2:105//vision/landmarks';
+    final apiUrl = 'http://192.168.1.56:105//vision/landmarks';
     final response = await http.post(Uri.parse(apiUrl), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'image': imagePath, 'latitudine': latitudine, 'longitudine': longitudine, 'tipo': 2}));
     Reference referenceRoot = FirebaseStorage.instance.ref();
     Reference referenceDirMon = referenceRoot.child('images');
@@ -130,7 +132,7 @@ class _ReportState extends State<Report> {
     if (response.statusCode == 200) {
       Navigator.of(this.context).pop();
       return json.decode(response.body);
-    } else {
+    } else{
       apriDartFile2(context);
       throw Exception('Failed to fetch landmarks');
     }
@@ -159,6 +161,7 @@ class _ReportState extends State<Report> {
         'city': city,
         'monument': monument,
         'note': note,
+        'imagePath' : url
       };
 
   

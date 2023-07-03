@@ -10,9 +10,10 @@ import '../widgets/BottomLoader.dart';
 import 'MonumentView.dart';
 import 'package:http/http.dart' as http;
 import 'dart:ui';
+import 'package:flutter/widgets.dart';
 
 class MonumentView extends StatefulWidget {
-  final String url;
+  final File? url;
   final String descrizione;
   final String monumento;
 
@@ -23,11 +24,12 @@ class MonumentView extends StatefulWidget {
 }
 
 class _MonumentViewState extends State<MonumentView> {
-  String url;
+  File? url;
   String descrizione;
   String monumento;
 
   _MonumentViewState(this.url, this.descrizione, this.monumento);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,10 +55,10 @@ class _MonumentViewState extends State<MonumentView> {
                       bottomLeft: Radius.circular(16.0),
                       bottomRight: Radius.circular(16.0),
                     ),
-                    child: Image.network(
-                      widget.url,
-                      fit: BoxFit.cover,
-                    ),
+                    child: Image.file(
+                            widget.url!,
+                            fit: BoxFit.cover,
+                          ),
                   ),
                 ),
                 ListTile(

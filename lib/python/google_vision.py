@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import os
 from google.cloud import vision
 from google_vision_ai import VisionAI
@@ -13,6 +13,8 @@ from pymongo.server_api import ServerApi
 import requests
 from PIL import Image
 from io import BytesIO
+import datetime
+import shutil
 uri = "mongodb+srv://mathew23s:mathew23s@cluster0.hqtpku6.mongodb.net/?retryWrites=true&w=majority"
 # Create a new client and connect to the server
 client = MongoClient('mongodb://127.0.0.1/27017')
@@ -50,7 +52,7 @@ def landmarks():
             latitudine = risultato[1]
             longitudine = risultato[2]
         else:
-            image_data = prepare_image_web(image)
+            image_data = prepare_image_local(image)
             
             client = vision.ImageAnnotatorClient()
             va = VisionAI(client, image_data)
@@ -93,13 +95,16 @@ def landmarks():
         if not result:
             collection.insert_one(monumento)
         if desc:
-            response = requests.get(image)
-            img = Image.open(BytesIO(response.content))
-            binary_stream = BytesIO()
-            img.save(binary_stream, format="JPEG")
-            binary_data = binary_stream.getvalue()
+            ora_corrente = datetime.datetime.now().strftime("%H-%M-%S")
+            estensione = os.path.splitext(image)[1]
+            if not os.path.exists(f"/Users/matteociccone/Desktop/casodistudio/files/{nome}"):
+                os.makedirs(f"/Users/matteociccone/Desktop/casodistudio/files/{nome}")
+            
+            filePath = f"/Users/matteociccone/Desktop/casodistudio/files/{nome}/{ora_corrente}.{estensione}"
+            shutil.move(image,filePath)
+            
             collection = database['mon_images']
-            image_id = collection.insert_one({'image': binary_data, 'monument_name': nome}).inserted_id
+            image_id = collection.insert_one({'image': filePath, 'monument_name': nome}).inserted_id
     else:
         cp = get_closest_place(lat,lon, api_key)
         collection = database["monuments"]
@@ -125,6 +130,31 @@ def landmarks():
 
     jsonMonu = json.dumps(monumento)
     return jsonMonu
+
+
+@app.route('/files/input/<filename>')
+def get_file(filename):
+    file_dir = '/Users/matteociccone/Desktop/casodistudio/files/input'
+    return send_from_directory(file_dir, filename)
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    file = request.files['file']
+    file.save(os.path.join('/Users/matteociccone/Desktop/casodistudio/files/input', file.filename))
+    file_path = f"/Users/matteociccone/Desktop/casodistudio/files/input/{file.filename}"  #Costruisci il percorso completo del file
+    return jsonify({'file_path': file_path})
+
+@app.route('/upload_label', methods=['POST'])
+def upload_label():
+    file = request.files['file']
+    file.save(os.path.join('/Users/matteociccone/Desktop/casodistudio/files/input', file.filename))
+    file_path = f"http://192.168.1.56:105/files/input/{file.filename}"  #Costruisci il percorso completo del file
+    return jsonify({'file_path': file_path})  
+
+@app.route('/list')
+def list_files():
+    files = os.listdir('files/')
+    return {'files': files}
 
 if __name__ == '__main__':
    app.run(host='0.0.0.0', port=105)

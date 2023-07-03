@@ -61,7 +61,7 @@ class _AddPhotoState extends State<AddPhoto> {
   void apriDartFile(BuildContext context) {
     Navigator.push(
       context,
-     PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => MonumentView(url: _imageUrl, descrizione: _descrizione, monumento: _monumento,),
+     PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => MonumentView(url: _image, descrizione: _descrizione, monumento: _monumento,),
      transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return child;
     },
@@ -72,7 +72,7 @@ class _AddPhotoState extends State<AddPhoto> {
   void apriDartFile2(BuildContext context) {
     Navigator.push(
       context,
-     PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => Report(url: _imageUrl),
+     PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => Report(url: _imageUrl, image: _image),
      transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return child;
     },
@@ -80,7 +80,7 @@ class _AddPhotoState extends State<AddPhoto> {
     
     );
   }
-  //Ciao
+
   //Funzione per il riconoscimento di monumenti
   Future<Map<String, dynamic>> fetchLandmarks(String imagePath, double latitudine, double longitudine, int tipo) async {
     showDialog(context: this.context, 
@@ -88,7 +88,7 @@ class _AddPhotoState extends State<AddPhoto> {
       return Center(child: CircularProgressIndicator());
       }
     );
-    final apiUrl = 'http://172.20.10.2:105//vision/landmarks';
+    final apiUrl = 'http://192.168.1.56:105//vision/landmarks';
     final response = await http.post(Uri.parse(apiUrl), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'image': imagePath, 'latitudine': latitudine, 'longitudine': longitudine, 'tipo': 1}));
     Reference referenceRoot = FirebaseStorage.instance.ref();
     Reference referenceDirMon = referenceRoot.child('images');
@@ -120,22 +120,34 @@ String _imageUrl = '';
     } on PlatformException catch (e) {
       print('Failed to pick Image: $e');
     } 
-
-    Reference referenceRoot = FirebaseStorage.instance.ref();
-    Reference referenceDirImages = referenceRoot.child('images');
-    Reference imageToUpload = referenceDirImages.child('mon');
-
+  
     try {
-      await imageToUpload.putFile(File(_image!.path));
-      String imageUrl = await imageToUpload.getDownloadURL();
-      setState(() {
-        _imageUrl = imageUrl;
-      });
-      print(_imageUrl);
+      uploadImage(_image!);
         } catch (e) {
                   
                 }
   }
+
+  Future<void> uploadImage(File imageFile) async {
+  var url = 'http://192.168.1.56:105/upload';
+  
+  var request = http.MultipartRequest('POST', Uri.parse(url));
+  request.files.add(await http.MultipartFile.fromPath('file', imageFile.path));
+  
+  var response = await request.send();
+  
+  if (response.statusCode == 200) {
+    var jsonResponse = await response.stream.bytesToString();
+    var data = jsonDecode(jsonResponse);
+    String filePath = data['file_path'];
+    setState(() {
+      _imageUrl = filePath;
+    });
+    print('Immagine caricata con successo!');
+  } else {
+    print('Errore durante il caricamento dell\'immagine.');
+  }
+}
 //ciao a tutti
 
   Future<File> saveFilePermanently(String imagePath) async {

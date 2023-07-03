@@ -283,8 +283,8 @@ def GLClassifier(imageUrl, lat, lon):
     labels = dict(zip(df.id,df.name))
 
     #urllib.request.urlretrieve(imageUrl, 'image.jpg')
-    response = requests.get(imageUrl)
-    img = Image.open(BytesIO(response.content))
+    #response = requests.get(imageUrl)
+    img = Image.open(imageUrl)
     #img = PIL.Image.open(imageUrl)
     img = img.resize(img_shape)
     img = np.array(img)/255.0
