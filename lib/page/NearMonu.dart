@@ -98,12 +98,8 @@ class _NearMonuState extends State<NearMonu> {
   }
 
   void getNearbyPlaces() async {
-    var url = Uri.parse('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' +
-        _latitudine.toString() +
-        ',' +
-        _longitudine.toString() +
-        '&radius=200&type=tourist_attraction&key=AIzaSyBcJWVfG4CAf8LV298KAbacKrN4R38nzd4');
-    var response = await http.post(url);
+    var url = Uri.parse('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${_latitudine.toString()},${_longitudine.toString()}&radius=200&type=tourist_attraction&key=AIzaSyBMKW_Sa0VGRwsSFQNV5uURtVz7dw_bOpU');
+    var response = await http.get(url);
     setState(() {
       nearbyResponse = NearbyResponse.fromJson(jsonDecode(response.body));
       print(nearbyResponse);

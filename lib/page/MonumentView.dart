@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'dart:convert';
 import '../widgets/BottomLoader.dart';
+import 'AddPhoto.dart';
 import 'MonumentView.dart';
 import 'package:http/http.dart' as http;
 import 'dart:ui';
@@ -31,10 +32,28 @@ class _MonumentViewState extends State<MonumentView> {
   _MonumentViewState(this.url, this.descrizione, this.monumento);
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Dettagli Monumento'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => AddPhoto(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return child;
+            },
+          ),
+          );
+          },
+        ),
+        title: Text('MonumentView'),
       ),
       body: Container(
         color: Colors.grey[200],

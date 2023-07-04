@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_vision/google_vision.dart' as google_vision;
 import 'package:image_picker/image_picker.dart' show ImagePicker, ImageSource;
+import 'package:monureg/home.dart';
+import 'package:monureg/page/NearMonu.dart';
 import 'package:monureg/page/Report.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
@@ -149,7 +151,7 @@ String _imageUrl = '';
     print('Errore durante il caricamento dell\'immagine.');
   }
 }
-//ciao a tutti
+
 
   Future<File> saveFilePermanently(String imagePath) async {
     final directory = await getApplicationDocumentsDirectory();
@@ -159,9 +161,27 @@ String _imageUrl = '';
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => Home(),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return child;
+            },
+          ),
+          );
+          },
+        ),
         title: Text('Image Picker'),
       ),
       body: Center(
