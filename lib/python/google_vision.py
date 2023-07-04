@@ -92,8 +92,12 @@ def landmarks():
             "latitudine": latitudine,
             "longitudine": longitudine,
         }
+
         if not result:
             collection.insert_one(monumento)
+
+            del monumento['_id']
+
         if desc:
             ora_corrente = datetime.datetime.now().strftime("%H-%M-%S")
             estensione = os.path.splitext(image)[1]
