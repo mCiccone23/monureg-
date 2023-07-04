@@ -29,6 +29,7 @@ class _AddPhotoState extends State<AddPhoto> {
   String _descrizione = '';
   double? _latitudine = 41;
   double? _longitudine = 16;
+   String ip = '192.168.1.56';
 
   void _getCurrentLocation() async {
     try {
@@ -88,7 +89,7 @@ class _AddPhotoState extends State<AddPhoto> {
       return Center(child: CircularProgressIndicator());
       }
     );
-    final apiUrl = 'http://192.168.1.56:105//vision/landmarks';
+    final apiUrl = 'http://${ip}:105//vision/landmarks';
     final response = await http.post(Uri.parse(apiUrl), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'image': imagePath, 'latitudine': latitudine, 'longitudine': longitudine, 'tipo': 1}));
     Reference referenceRoot = FirebaseStorage.instance.ref();
     Reference referenceDirMon = referenceRoot.child('images');
@@ -129,7 +130,7 @@ String _imageUrl = '';
   }
 
   Future<void> uploadImage(File imageFile) async {
-  var url = 'http://192.168.1.56:105/upload';
+  var url = 'http://${ip}:105/upload';
   
   var request = http.MultipartRequest('POST', Uri.parse(url));
   request.files.add(await http.MultipartFile.fromPath('file', imageFile.path));

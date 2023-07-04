@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart' as geo;
 import 'package:geolocator_platform_interface/geolocator_platform_interface.dart';
 import 'package:monureg/page/AddPhoto.dart';
 import 'dart:io';
+import 'package:network_info_plus/network_info_plus.dart';
 
 import 'MonumentView.dart';
 
@@ -49,6 +50,10 @@ class _ReportState extends State<Report> {
   String _descrizione = '';
   double? _latitudine = 0;
   double? _longitudine = 0;
+  String ip = '192.168.1.56';
+  
+
+
 
   String? _imageUrl = ' ';
 
@@ -124,7 +129,7 @@ class _ReportState extends State<Report> {
       return Center(child: CircularProgressIndicator());
       }
     );
-    final apiUrl = 'http://192.168.1.56:105//vision/landmarks';
+    final apiUrl = 'http://${ip}:105//vision/landmarks';
     final response = await http.post(Uri.parse(apiUrl), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'image': imagePath, 'latitudine': latitudine, 'longitudine': longitudine, 'tipo': 2}));
     Reference referenceRoot = FirebaseStorage.instance.ref();
     Reference referenceDirMon = referenceRoot.child('images');

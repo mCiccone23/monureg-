@@ -7,22 +7,17 @@ import 'package:http/http.dart' as http;
 import 'nearby_response.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-
-
-
 class NearMonu extends StatefulWidget {
   @override
   _NearMonuState createState() => _NearMonuState();
 }
 
 class _NearMonuState extends State<NearMonu> {
-
   double _latitudine = 41.123516;
   double _longitudine = 16.872554;
 
   NearbyResponse nearbyResponse = NearbyResponse();
   Completer<GoogleMapController> _mapController = Completer();
-  
 
   void _onMapCreated(GoogleMapController controller) {
     _mapController.complete(controller);
@@ -30,6 +25,7 @@ class _NearMonuState extends State<NearMonu> {
       controller.showMarkerInfoWindow(MarkerId('currentLocation'));
     });
   }
+
   void _getCurrentLocation() async {
     try {
       LocationPermission permission = await geo.Geolocator.checkPermission();
@@ -63,7 +59,6 @@ class _NearMonuState extends State<NearMonu> {
     );
     controller.animateCamera(CameraUpdate.newCameraPosition(newPosition));
   }
-
 
   Set<Marker> _createMarkers() {
     Set<Marker> markers = Set<Marker>();
@@ -102,28 +97,38 @@ class _NearMonuState extends State<NearMonu> {
     return markers;
   }
 
-  void getNearbyPlaces() async{
-  var url = Uri.parse('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + _latitudine.toString() + ',' + _longitudine.toString() + '&radius=200&type=tourist_attraction&key=AIzaSyBcJWVfG4CAf8LV298KAbacKrN4R38nzd4');
-  var response = await http.post(url);
-  nearbyResponse = NearbyResponse.fromJson(jsonDecode(response.body));
+  void getNearbyPlaces() async {
+    var url = Uri.parse('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' +
+        _latitudine.toString() +
+        ',' +
+        _longitudine.toString() +
+        '&radius=200&type=tourist_attraction&key=AIzaSyBcJWVfG4CAf8LV298KAbacKrN4R38nzd4');
+    var response = await http.post(url);
+    setState(() {
+      nearbyResponse = NearbyResponse.fromJson(jsonDecode(response.body));
+      print(nearbyResponse);
+    });
+    
+  }
 
-}
+  void updateMapAndPlaces() async {
+    getNearbyPlaces();
+    _updateCameraPosition();
+  }
 
-void updateMapAndPlaces() async {
-  getNearbyPlaces();
-  _updateCameraPosition();
-}
-
-StreamSubscription? _getPositionSubscription;
+  StreamSubscription? _getPositionSubscription;
 
   @override
   void initState() {
     super.initState();
-    updateMapAndPlaces();
- 
+    _getCurrentLocation();
   }
 
-  
+  @override
+  void dispose() {
+    _getPositionSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,6 +146,12 @@ StreamSubscription? _getPositionSubscription;
               markers: _createMarkers(),
             ),
           ),
+          ElevatedButton(
+            child: Text('Aggiorna Posizione'),
+            onPressed: () {
+              _getCurrentLocation();
+            },
+          ),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -156,23 +167,23 @@ StreamSubscription? _getPositionSubscription;
       ),
     );
   }
-  
-  Widget nearbyPlacesWidget(Results results){
 
+  Widget nearbyPlacesWidget(Results results) {
     return Container(
       width: MediaQuery.of(this.context).size.width,
       margin: const EdgeInsets.only(top: 10, left: 10, right: 10),
       padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(border: Border.all(color: Colors.black), borderRadius: BorderRadius.circular(10)),
-
-      child: Column(
-        children: [
-          Text("Name: " + results.name!),
-          Text("Location: " + results.geometry!.location!.lat.toString() + ", " + results.geometry!.location!.lng.toString()),
-          Text(results.openingHours != null ? "Open" : "Closed"),
-        ]
-      ),
+      decoration: BoxDecoration(
+          border: Border.all(color: Colors.black),
+          borderRadius: BorderRadius.circular(10)),
+      child: Column(children: [
+        Text("Name: " + results.name!),
+        Text("Location: " +
+            results.geometry!.location!.lat.toString() +
+            ", " +
+            results.geometry!.location!.lng.toString()),
+        Text(results.openingHours != null ? "Open" : "Closed"),
+      ]),
     );
   }
-
 }
