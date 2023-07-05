@@ -150,39 +150,54 @@ class _ReportState extends State<Report> {
       final monument = _monumentController.text;
       final note = _noteController.text;
 
+      final apiUrl = 'http://${ip}:105//upload_report';
+      final response = await http.post(Uri.parse(apiUrl), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'email' : email, 'city': city, 'monument' : monument, 'note': note}));
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Dati salvati con successo')),
+      );
+        Navigator.of(context).popUntil((route) => route.isFirst);
+        return json.decode(response.body);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Errore nel salvataggio dei dati')),
+        );
+        apriDartFile2(this.context);
+        throw Exception('Report Error');
+      }
       // Connessione al database MongoDB
-      final db = mongo.Db("mongodb://10.0.2.2:27017/monureg");
-      await db.open();
+    //   final db = mongo.Db("mongodb://10.0.2.2:27017/monureg");
+    //   await db.open();
 
-      // Collezione nel database in cui verranno salvati i dati
-      final collection = db.collection('reports');
+    //   // Collezione nel database in cui verranno salvati i dati
+    //   final collection = db.collection('reports');
 
-      var objectId = mongo.ObjectId(); // Crea un nuovo ObjectId
+    //   var objectId = mongo.ObjectId(); // Crea un nuovo ObjectId
 
-      // Documento da salvare nel database
-      final document = {
-        '_id': objectId.toHexString(),
-        'email': email,
-        'city': city,
-        'monument': monument,
-        'note': note,
-        'imagePath' : url
-      };
+    //   // Documento da salvare nel database
+    //   final document = {
+    //     '_id': objectId.toHexString(),
+    //     'email': email,
+    //     'city': city,
+    //     'monument': monument,
+    //     'note': note,
+    //     'imagePath' : url
+    //   };
 
   
 
-      // Inserimento del documento nella collezione
-      await collection.insertOne(document);
+    //   // Inserimento del documento nella collezione
+    //   await collection.insertOne(document);
 
-      // Chiusura della connessione al database
-      await db.close();
+    //   // Chiusura della connessione al database
+    //   await db.close();
 
-      // Mostrare una notifica o effettuare un'azione di conferma
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Dati salvati con successo')),
-      );
+    //   // Mostrare una notifica o effettuare un'azione di conferma
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(content: Text('Dati salvati con successo')),
+    //   );
 
-      Navigator.of(context).popUntil((route) => route.isFirst);
+    //   Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
 
@@ -224,7 +239,7 @@ class _ReportState extends State<Report> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  ElevatedButton(
+                  /*ElevatedButton(
                     onPressed: () {
                       _getCurrentLocation();
             fetchLandmarks(url, _latitudine!, _longitudine!)
@@ -242,7 +257,7 @@ class _ReportState extends State<Report> {
               });
                     },
                     child: Text('Monumento + vicino GPS'),
-                  ),
+                  ),*/
                   SizedBox(height: 20),
                   TextFormField(
                     controller: _emailController,

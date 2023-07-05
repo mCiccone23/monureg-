@@ -159,6 +159,31 @@ def upload_label():
 def list_files():
     files = os.listdir('files/')
     return {'files': files}
+@app.route('/upload_report', methods=['POST'])
+
+def upload_report():
+    data = request.json
+    email = data['email']
+    city = data['city']
+    monument = data['monument']
+    note = data['note']
+
+    report = {
+        'email' : email,
+        'city' : city,
+        'monument' : monument,
+        'note' : note,
+    }
+
+    collection = database["reports"]
+    collection.insert_one(report).inserted_id
+    report = {
+        'email' : email,
+        'city' : city,
+        'monument' : monument,
+        'note' : note,
+    }
+    return json.dumps(report)
 
 if __name__ == '__main__':
    app.run(host='0.0.0.0', port=105)
