@@ -50,7 +50,7 @@ class _ReportState extends State<Report> {
   String _descrizione = '';
   double? _latitudine = 0;
   double? _longitudine = 0;
-  String ip = '192.168.1.56';
+  String ip = '172.29.37.4';
   
 
 
@@ -87,7 +87,7 @@ class _ReportState extends State<Report> {
   void apriDartFile(BuildContext context) {
     Navigator.push(
       context,
-     PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => MonumentView(url: _image, descrizione: _descrizione, monumento: _monumento,),
+     PageRouteBuilder(pageBuilder: (context, animation, secondaryAnimation) => MonumentView(url: image, descrizione: _descrizione, monumento: _monumento,),
      transitionsBuilder: (context, animation, secondaryAnimation, child) {
       return child;
     },
@@ -129,10 +129,9 @@ class _ReportState extends State<Report> {
       return Center(child: CircularProgressIndicator());
       }
     );
+  
     final apiUrl = 'http://${ip}:105//vision/landmarks';
     final response = await http.post(Uri.parse(apiUrl), headers: {'Content-Type': 'application/json'}, body: jsonEncode({'image': imagePath, 'latitudine': latitudine, 'longitudine': longitudine, 'tipo': 2}));
-    Reference referenceRoot = FirebaseStorage.instance.ref();
-    Reference referenceDirMon = referenceRoot.child('images');
     
     if (response.statusCode == 200) {
       Navigator.of(this.context).pop();
@@ -201,6 +200,11 @@ class _ReportState extends State<Report> {
     }
   }
 
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -239,7 +243,7 @@ class _ReportState extends State<Report> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  /*ElevatedButton(
+                  ElevatedButton(
                     onPressed: () {
                       _getCurrentLocation();
             fetchLandmarks(url, _latitudine!, _longitudine!)
@@ -257,7 +261,7 @@ class _ReportState extends State<Report> {
               });
                     },
                     child: Text('Monumento + vicino GPS'),
-                  ),*/
+                  ),
                   SizedBox(height: 20),
                   TextFormField(
                     controller: _emailController,
